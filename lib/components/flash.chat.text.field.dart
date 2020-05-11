@@ -14,6 +14,7 @@ class FlashAppInputText extends StatelessWidget {
       color: color,
       padding: EdgeInsets.all(10),
       child: TextField(
+        keyboardType: TextInputType.emailAddress,
         style: TextStyle(
           color: Colors.white
         ),

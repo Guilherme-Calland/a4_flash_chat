@@ -1,5 +1,6 @@
 import 'package:a4_flash_chat/components/flash.chat.button.dart';
 import 'package:a4_flash_chat/components/flash.chat.text.field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Registration extends StatefulWidget {
@@ -13,6 +14,7 @@ class Registration extends StatefulWidget {
 class _RegistrationState extends State<Registration> {
   String email;
   String password;
+  var auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +45,22 @@ class _RegistrationState extends State<Registration> {
               hint: 'enter your password'
             ),
             FlashChatButton(
-              'register', Colors.purple, (){
-                //register
+              'register', Colors.purple, () async{
+                try{
+                    var newUser = await auth.createUserWithEmailAndPassword(
+                    email: email, 
+                    password: password
+                  );
+
+                  if(newUser!=null){
+                    Navigator.pushNamed(
+                      context, 
+                      'chat_screen'
+                    );
+                  }
+                }catch(e){
+                  print('aqui: $e');
+                }
               }
             )
           ],

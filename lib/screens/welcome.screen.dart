@@ -19,7 +19,7 @@ class _WelcomeState extends State<Welcome> {
           child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('flash app', style: TextStyle(
+            Text('gui\'s app', style: TextStyle(
               color: Colors.white
             ),),
             FlashChatButton(
