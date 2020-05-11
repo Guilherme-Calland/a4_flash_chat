@@ -12,12 +12,14 @@ class Chat extends StatefulWidget {
   _ChatState createState() => _ChatState();
 }
 
+bool isMe = false;
+FirebaseUser currentUser;
+
 class _ChatState extends State<Chat> {
   var auth = FirebaseAuth.instance;
   var firestore = Firestore.instance;
-  var controller = TextEditingController;
+  var controller = TextEditingController();
   String message;
-  FirebaseUser currentUser;
 
   @override
   void initState(){
@@ -69,12 +71,14 @@ class _ChatState extends State<Chat> {
               border: Border.all( 
                 color: Colors.white
               )
-            )
+            ),
+            child: MessagesStream(firestore: firestore)
           ),
           Row(
             children: <Widget>[
               Expanded(
                 child: FlashAppInputText(
+                  controller: controller,
                   color: Color(0xff065600),
                   hint: 'type a message',
                   onChanged: (value){
@@ -86,10 +90,12 @@ class _ChatState extends State<Chat> {
                 'send',
                 Color(0xff065600),
                 (){
+                  controller.clear();
                   firestore.collection('messages').add(
                     {
                       'text' : message,
-                      'sender' : currentUser.email
+                      'sender' : currentUser.email,
+                      'date' : DateTime.now()
                     }
                   );
                 }
@@ -98,6 +104,64 @@ class _ChatState extends State<Chat> {
           )
         ],
       ),
+    );
+  }
+}
+
+class MessagesStream extends StatelessWidget {
+  const MessagesStream({
+    Key key,
+    @required this.firestore,
+  }) : super(key: key);
+
+  final Firestore firestore;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestore.collection('messages').
+      orderBy('date', descending: true).snapshots(),
+      builder: (context, snapshot){
+        // print(snapshot.data.documents[1]['text']);
+        if(!snapshot.hasData){
+          return Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.green,
+            )
+          );
+        }
+        final messages = snapshot.data.documents;
+        List< Text > messageBubbles = [];
+        for(var message in messages){
+          var text = message.data['text'];
+          var sender = message.data['sender'];
+          
+          var user = null;
+          if(currentUser != null){
+            user = currentUser.email;
+          } else {
+            print('nobody here');
+          }
+
+          user == sender ? isMe = true : isMe = false;
+
+          var messageBubble = Text(
+            '$sender: $text',
+            style: TextStyle(
+              color: isMe ? Color(0xff065600) : Colors.green
+            ),
+          );
+          
+          messageBubbles.add(messageBubble);
+
+        }
+        return Expanded(
+            child: ListView(
+            reverse: true,
+            children: messageBubbles,
+          ),
+        );
+      }
     );
   }
 }
