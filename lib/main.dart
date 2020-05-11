@@ -16,7 +16,7 @@ class FlashApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: Welcome.id,
+      initialRoute: Chat.id,
       routes: {
         Welcome.id: (context) => Welcome(),
         Registration.id: (context) => Registration(),
