@@ -1,5 +1,6 @@
 import 'package:a4_flash_chat/components/flash.chat.button.dart';
 import 'package:a4_flash_chat/components/flash.chat.text.field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -13,9 +14,28 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   var auth = FirebaseAuth.instance;
+  var firestore = Firestore.instance;
   var controller = TextEditingController;
   String message;
+  FirebaseUser currentUser;
 
+  @override
+  void initState(){
+    super.initState();
+    getCurrentUser();
+  }
+
+  getCurrentUser() async {
+    try{
+      final user = await auth.currentUser();
+      if(user!=null){
+        currentUser = user;
+      }
+    }catch(e){
+      print('getting current user: $e' );
+    }
+  }
+  
   @override
   void dispose() {
     // TODO: implement dispose
@@ -66,7 +86,12 @@ class _ChatState extends State<Chat> {
                 'send',
                 Color(0xff065600),
                 (){
-                  //envia uma mensagem pra firebase
+                  firestore.collection('messages').add(
+                    {
+                      'text' : message,
+                      'sender' : currentUser.email
+                    }
+                  );
                 }
               )
             ],
