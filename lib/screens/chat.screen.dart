@@ -146,7 +146,7 @@ class MessagesStream extends StatelessWidget {
           user == sender ? isMe = true : isMe = false;
 
           var messageBubble = Text(
-            '$sender: $text',
+            '$text',
             style: TextStyle(
               color: isMe ? Color(0xff065600) : Colors.green
             ),
